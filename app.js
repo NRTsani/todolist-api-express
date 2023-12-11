@@ -9,7 +9,8 @@ const respond = require('./libraries/respond');
 const logger = require('./libraries/logger');
 
 // import API Routes
-const taskApiV1 = require('./domains/task/v1/taskAPI');
+const setPublicRoutes = require('./routes/public');
+const setPrivateRoutes = require('./routes/private');
 
 // db start & configs
 try {
@@ -55,7 +56,8 @@ app.use(express.urlencoded({extended: false}));
 app.use(cors());
 
 // API routers
-app.use('/api/v1/tasks', taskApiV1);
+setPublicRoutes(app);
+setPrivateRoutes(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

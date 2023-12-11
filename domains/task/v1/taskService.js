@@ -1,5 +1,5 @@
 const taskConstant = require('./taskConstant');
-const taskDAL = require('./taskDAL');
+const repository = require('./repository');
 // const taskHelper = require('./taskHelper'); comment or delete when not used
 const errorHelper = require('../../../libraries/error');
 
@@ -9,16 +9,10 @@ const errorHelper = require('../../../libraries/error');
  */
 const index = async (query) => {
     // get data
-    const tasks = await taskDAL.list(query);
-    const totalFiltered = await taskDAL.total(query);
+    const tasks = await repository.list(query);
 
     return {
-        data: {
-            tasks: tasks,
-        },
-        meta: {
-            total_filtered: totalFiltered.total,
-        },
+        data: tasks
     };
 };
 
@@ -30,11 +24,12 @@ const create = async (body) => {
     // init new task data
     let newTask = {
         description: body.description,
-        status: taskConstant.TASK_STATUS_ACTIVE
+        status: taskConstant.TASK_STATUS_ACTIVE,
+        user_id: body.user_id,
     };
 
     // create task
-    let createdTask = await taskDAL.create(newTask);
+    let createdTask = await repository.create(newTask);
     if (!createdTask) errorHelper.throwInternalServerError("Create New Task Failed");
 
     return {
@@ -47,7 +42,7 @@ const create = async (body) => {
  * @param {String} id
  */
 const detail = async (id) => {
-    const task = await taskDAL.findById(id);
+    const task = await repository.findById(id);
     if (!task) errorHelper.throwNotFound("Task Not Found");
     return {
         task: task
@@ -60,7 +55,7 @@ const detail = async (id) => {
  * @param {Object} body
  */
 const updateOne = async (id, body) => {
-    const task = await taskDAL.findById(id);
+    const task = await repository.findById(id);
     if (!task) errorHelper.throwNotFound("Task Not Found");
 
     // update task data
@@ -76,7 +71,7 @@ const updateOne = async (id, body) => {
     }
 
     // update task
-    let updatedTask = await taskDAL.updateOne(id, body);
+    let updatedTask = await repository.updateOne(id, body);
     if (!updatedTask) errorHelper.throwInternalServerError("Update Task Failed");
 
     return {
@@ -89,12 +84,21 @@ const updateOne = async (id, body) => {
  * @param {String} id
  */
 const deleteOne = async (id) => {
-    const task = await taskDAL.findById(id);
+    const task = await repository.findById(id);
     if (!task) errorHelper.throwNotFound("Task Not Found");
 
     // update task
-    let result = await taskDAL.deleteOne(id);
+    let result = await repository.deleteOne(id);
     if (!result) errorHelper.throwInternalServerError("Delete Task Failed");
+
+    return result;
+};
+
+const deleteAll = async () => {
+
+    // update task
+    let result = await repository.deleteAll;
+    if (!result) errorHelper.throwInternalServerError("Empty Task Failed");
 
     return result;
 };
@@ -104,5 +108,6 @@ module.exports = {
     create,
     detail,
     updateOne,
-    deleteOne
+    deleteOne,
+    deleteAll
 };

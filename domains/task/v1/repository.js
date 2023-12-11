@@ -2,53 +2,6 @@ const {Task} = require('../task');
 const taskConstant = require('./taskConstant');
 const mongoQuery = require('../../../libraries/mongoQuery');
 
-
-/**
- * Get Total Data
- * @param {Object} params
- */
-const total = async (params) => {
-    // init aggregate pipelines
-    let pipelines = [];
-
-    // init filters
-    let filters = [];
-
-    // filter : status
-    console.log(taskConstant.TASK_STATUS_LIST.includes(params.status))
-    if (params.status && taskConstant.TASK_STATUS_LIST.includes(params.status)) {
-        filters.push({status: params.status});
-    }
-
-    // filter : search
-    if (params.search && params.search !== "") {
-        filters.push({$text: {$search: params.search}});
-    }
-
-    // filter : start_date or end_date
-    if (params.start_date || params.end_date) {
-        filters.push({
-            'createdAt': mongoQuery.betweenDate(params.start_date, params.end_date),
-        });
-    }
-
-    // assign filters to pipelines
-    if (filters.length > 0) {
-        pipelines.push({$match: {$and: filters}});
-    }
-
-    // count
-    pipelines.push({$count: 'total'});
-
-    // result
-    let result = await Task.aggregate(pipelines);
-    if (result && result.length > 0) {
-        return result[0];
-    }
-
-    return {total: 0};
-};
-
 /**
  * Get List Data
  * @param {Object} params
@@ -75,11 +28,6 @@ const list = async (params) => {
         filters.push({
             'createdAt': mongoQuery.betweenDate(params.start_date, params.end_date),
         });
-    }
-
-    // filter : search
-    if (params.search && params.search !== "") {
-        filters.push({$text: {$search: params.search}});
     }
 
     // assign filters to pipelines
@@ -145,11 +93,16 @@ const deleteOne = async (id) => {
     return Task.deleteOne({_id: id});
 };
 
+const deleteAll = async () => {
+    return Task.deleteMany({});
+};
+
+
 module.exports = {
-    total,
     list,
     findById,
     create,
     updateOne,
     deleteOne,
+    deleteAll
 };

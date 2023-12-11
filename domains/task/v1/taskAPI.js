@@ -25,7 +25,7 @@ router.post(
 );
 
 /**
- * Get Detail Task
+ * Get Task by Id
  * @api public
  */
 router.get(
@@ -50,6 +50,11 @@ router.put(
 router.delete(
     '/:id',
     taskController.deleteOne
+);
+
+router.delete(
+    '/',
+    taskController.deleteAll
 );
 
 module.exports = router;

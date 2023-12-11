@@ -2,6 +2,7 @@ const Joi = require('joi');
 
 const create = Joi.object({
     description: Joi.string().required(),
+    user_id: Joi.string().required(),
 });
 
 const updateOne = Joi.object({

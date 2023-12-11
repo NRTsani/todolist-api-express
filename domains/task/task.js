@@ -2,6 +2,10 @@ const {Schema, model, SchemaTypes: {ObjectId}} = require('mongoose');
 
 let taskSchema = Schema(
     {
+        user_id: {
+            type: String,
+            required: true,
+          },
         status: {
             type: String,
             required: true,
@@ -38,5 +42,7 @@ taskSchema.index(
         }
     }
 );
+
+
 
 exports.Task = model("Task", taskSchema);

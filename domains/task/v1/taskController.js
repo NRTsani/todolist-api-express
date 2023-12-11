@@ -96,10 +96,27 @@ const deleteOne = async (req, res) => {
     }
 };
 
+const deleteAll = async (req, res) => {
+    try {
+        const result = await taskService.deleteAll();
+        return respond.responseSuccess(res, "Task Emptied successfully", undefined, undefined);
+    } catch (e) {
+        if (e.name === errorHelper.NOT_FOUND) {
+            return respond.responseNotFound(res, e.message);
+        }
+        if (e.name === errorHelper.UNPROCESSABLE_ENTITY) {
+            return respond.responseUnprocessableEntity(res, e.message);
+        }
+        logger.info(e);
+        return respond.responseError(res, e.statusCode, e.message);
+    }
+};
+
 module.exports = {
     index,
     create,
     detail,
     updateOne,
     deleteOne,
+    deleteAll
 };
